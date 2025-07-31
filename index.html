@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wybierz co zjemy!</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #fff9f5;
+      color: #333;
+      max-width: 600px;
+      margin: auto;
+      padding: 2rem;
+    }
+    .question {
+      margin-bottom: 2rem;
+    }
+    button {
+      display: block;
+      margin: 0.5rem 0;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #ffd3b6;
+      cursor: pointer;
+    }
+    #backBtn {
+      margin-top: 2rem;
+      background-color: #ccc;
+    }
+    .hidden {
+      display: none;
+    }
+    .result {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Odpowiedz na pytania i dowiedz się, co dziś zjemy 🍽️</h1>
+
+  <div id="questionContainer" class="question"></div>
+  <button id="backBtn" class="hidden">⬅️ Cofnij</button>
+
+  <script>
+    const questions = [
+      {
+        id: 'poradnia',
+        text: 'Kiedy najchętniej jesz?',
+        options: ['Rano', 'Południe', 'Wieczorem']
+      },
+      {
+        id: 'smak',
+        getOptions: (answers) => {
+          switch (answers.poradnia) {
+            case 'Rano':
+              return ['Coś słodkiego', 'Coś delikatnego i ciepłego', 'Kawa i lekka przekąska'];
+            case 'Południe':
+              return ['Coś konkretnego', 'Coś lekkiego i świeżego', 'Kawa i coś słonego'];
+            case 'Wieczorem':
+              return ['Coś na ciepło i sycącego', 'Coś romantycznego i lekkiego', 'Kolacja + kawa/herbata'];
+          }
+        },
+        text: 'Na co masz dziś ochotę?'
+      },
+      {
+        id: 'temperatura',
+        text: 'Wolisz coś:',
+        options: ['Ciepłego', 'Zimnego i orzeźwiającego']
+      },
+      {
+        id: 'nastroj',
+        text: 'Jaki masz nastrój?',
+        options: ['Chcę się przytulić do czegoś pysznego 🍲', 'Mam ochotę na coś radosnego i kolorowego 🧁']
+      }
+    ];
+
+    const restauracje = {
+      'Rano-Coś słodkiego-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Jaglana – gofry gryczane z owocami 🍓',
+      'Rano-Kawa i lekka przekąska-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Sorrir – smoothie bowl i kawa ☕',
+      'Południe-Coś konkretnego-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Pizza Naturalna – Margherita na bezglutenowym cieście 🍕',
+      'Południe-Coś lekkiego i świeżego-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Bezzbożny – sałatka z komosą ryżową 🥗',
+      'Wieczorem-Coś romantycznego i lekkiego-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Też Można – wegański burger na bezglutenowej bułce 🍔',
+      'Wieczorem-Kolacja + kawa/herbata-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Kafej – ciasto czekoladowe i kawa ☕'
+    };
+
+    let currentIndex = 0;
+    const answers = {};
+    let history = [];
+
+    const container = document.getElementById('questionContainer');
+    const backBtn = document.getElementById('backBtn');
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      container.innerHTML = `<h2>${q.text}</h2>`;
+
+      let options = q.options || (typeof q.getOptions === 'function' ? q.getOptions(answers) : []);
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => {
+          answers[q.id] = opt;
+          history.push(currentIndex);
+          currentIndex++;
+          if (currentIndex < questions.length) {
+            renderQuestion();
+          } else {
+            showResult();
+          }
+        };
+        container.appendChild(btn);
+      });
+
+      backBtn.classList.toggle('hidden', history.length === 0);
+    }
+
+    function showResult() {
+      const key = `${answers.poradnia}-${answers.smak}-${answers.temperatura}-${answers.nastroj}`;
+      const result = restauracje[key] || 'Ups! Coś poszło nie tak. Zróbmy to jeszcze raz 💔';
+      container.innerHTML = `<div class="result">${result}</div>`;
+      backBtn.classList.remove('hidden');
+    }
+
+    backBtn.onclick = () => {
+      if (history.length > 0) {
+        currentIndex = history.pop();
+        renderQuestion();
+      }
+    };
+
+    renderQuestion();
+  </script>
+</body>
+</html>
