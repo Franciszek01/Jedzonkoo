@@ -3,135 +3,449 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wybierz co zjemy!</title>
+  <title>Co zjeść? - Quiz</title>
   <style>
     body {
-      font-family: sans-serif;
-      background-color: #fff9f5;
+      font-family: Arial, sans-serif;
+      background: #fdfdfd;
       color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
       max-width: 600px;
       margin: auto;
-      padding: 2rem;
-    }
-    .question {
-      margin-bottom: 2rem;
-    }
-    button {
-      display: block;
-      margin: 0.5rem 0;
-      padding: 0.8rem 1.2rem;
-      border: none;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      background-color: #ffd3b6;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    h1, h2, h3 {
+      text-align: center;
+      color: #444;
+    }
+    h1 { font-size: 1.8em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.5em; margin: 0.5em 0; }
+    h3 { font-size: 1.2em; margin: 0.5em 0; }
+    p { font-size: 1em; line-height: 1.5; }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .options button {
+      font-size: 1em;
+      padding: 12px;
+      border: 2px solid #4a90e2;
+      background: #4a90e2;
+      color: #fff;
+      border-radius: 5px;
       cursor: pointer;
+      transition: background 0.3s;
+    }
+    .options button:hover {
+      background: #357ab8;
+    }
+    .options button:disabled {
+      background: #ccc;
+      border-color: #ccc;
+      cursor: default;
     }
     #backBtn {
-      margin-top: 2rem;
-      background-color: #ccc;
+      margin: 10px 0;
+      font-size: 0.9em;
+      background: #fff;
+      color: #4a90e2;
+      border-color: #4a90e2;
     }
-    .hidden {
-      display: none;
+    #backBtn:hover {
+      background: #eef6ff;
     }
-    .result {
-      font-size: 1.3rem;
-      font-weight: bold;
+    .final-screen {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .final-images {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .final-images img {
+      max-width: 45%;
+      height: auto;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .final-screen p {
+      font-size: 1.1em;
+    }
+    .final-screen a {
+      color: #4a90e2;
+      text-decoration: none;
+    }
+    .final-screen a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <h1>Odpowiedz na pytania i dowiedz się, co dziś zjemy 🍽️</h1>
-
-  <div id="questionContainer" class="question"></div>
-  <button id="backBtn" class="hidden">⬅️ Cofnij</button>
-
+<div class="container">
+  <h1>Co zjeść?</h1>
+  <div id="quizContent">
+    <!-- Quiz questions and results will appear here -->
+  </div>
+  <button id="backBtn" disabled>Cofnij</button>
+</div>
+<script>
   <script>
-    const questions = [
-      {
-        id: 'poradnia',
-        text: 'Kiedy najchętniej jesz?',
-        options: ['Rano', 'Południe', 'Wieczorem']
-      },
-      {
-        id: 'smak',
-        getOptions: (answers) => {
-          switch (answers.poradnia) {
-            case 'Rano':
-              return ['Coś słodkiego', 'Coś na słono', 'Kawa i lekka przekąska', 'Nie wiem'];
-            case 'Południe':
-              return ['Pizza', 'Burger', 'Sałatka', 'Kawa i lekka przekąska'];
-            case 'Wieczorem':
-              return ['Romantyczna kolacja', 'Coś na ciepło i sycącego', 'Coś do podziału (np. tapas)', 'Drin i coś lekkiego'];
-          }
-        },
-        text: 'Na co masz dziś ochotę?'
-      },
-      {
-        id: 'temperatura',
-        text: 'Wolisz coś:',
-        options: ['Ciepłego', 'Zimnego i orzeźwiającego']
-      },
-      {
-        id: 'nastroj',
-        text: 'Jaki masz nastrój?',
-        options: ['Chcę się przytulić do czegoś pysznego 🍲', 'Mam ochotę na coś radosnego i kolorowego 🧁']
-      }
-    ];
+  const quizContent = document.getElementById('quizContent');
+  const backBtn = document.getElementById('backBtn');
 
-    const restauracje = {
-      'Rano-Coś słodkiego-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Jaglana – gofry gryczane z owocami 🍓',
-      'Rano-Kawa i lekka przekąska-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Sorrir – smoothie bowl i kawa ☕',
-      'Południe-Pizza-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Pizza Naturalna – Margherita na bezglutenowym cieście 🍕',
-      'Południe-Sałatka-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Bezzbożny – sałatka z komosą ryżową 🥗',
-      'Wieczorem-Romantyczna kolacja-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Też Można – wegański burger na bezglutenowej bułce 🍔',
-      'Wieczorem-Drin i coś lekkiego-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Kafej – ciasto czekoladowe i kawa ☕'
-    };
+  let currentStep = null;
+  let prevStep = null;
+  let prevOptions = null;
+  let backUsed = false;
 
-    let currentIndex = 0;
-    const answers = {};
-    let history = [];
+  function startQuiz() {
+    currentStep = 'timeOfDay';
+    prevStep = null;
+    backUsed = false;
+    backBtn.disabled = true;
+    showQuestion("Jaka pora dnia?", {
+      "Rano": () => selectTime('morning'),
+      "Południe": () => selectTime('midday'),
+      "Wieczór": () => selectTime('evening')
+    });
+  }
 
-    const container = document.getElementById('questionContainer');
-    const backBtn = document.getElementById('backBtn');
+  function showQuestion(questionText, optionsObj) {
+    let html = `<h2>${questionText}</h2><div class="options">`;
+    for (let [label, callback] of Object.entries(optionsObj)) {
+      html += `<button>${label}</button>`;
+    }
+    html += `</div>`;
+    quizContent.innerHTML = html;
 
-    function renderQuestion() {
-      const q = questions[currentIndex];
-      container.innerHTML = `<h2>${q.text}</h2>`;
-
-      let options = q.options || (typeof q.getOptions === 'function' ? q.getOptions(answers) : []);
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.textContent = opt;
-        btn.onclick = () => {
-          answers[q.id] = opt;
-          history.push(currentIndex);
-          currentIndex++;
-          if (currentIndex < questions.length) {
-            renderQuestion();
-          } else {
-            showResult();
-          }
-        };
-        container.appendChild(btn);
+    const buttons = quizContent.querySelectorAll('button');
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        prevStep = currentStep;
+        prevOptions = optionsObj;
+        if (!backUsed) backBtn.disabled = false;
+        const choice = button.textContent;
+        if (optionsObj[choice]) {
+          optionsObj[choice]();
+        }
       });
+    });
+  }
 
-      backBtn.classList.toggle('hidden', history.length === 0);
+  backBtn.addEventListener('click', () => {
+    if (prevStep && !backUsed) {
+      backUsed = true;
+      currentStep = prevStep;
+      startQuiz(); // prosty powrót
+      backBtn.disabled = true;
     }
-
-    function showResult() {
-      const key = `${answers.poradnia}-${answers.smak}-${answers.temperatura}-${answers.nastroj}`;
-      const result = restauracje[key] || 'Ups! Coś poszło nie tak. Zróbmy to jeszcze raz 💔';
-      container.innerHTML = `<div class="result">${result}</div>`;
-      backBtn.classList.remove('hidden');
+  });
+    function selectTime(period) {
+    currentStep = period;
+    if (period === 'morning') {
+      showQuestion("Co masz ochotę zjeść rano?", {
+        "Coś na słodko": () => { currentStep = 'morning_sweet'; askMorningSweetPref(); },
+        "Coś na słono": () => { currentStep = 'morning_savory'; askMorningSavoryPref(); },
+        "Kawa i lekka przekąska": () => { currentStep = 'morning_coffee'; askMorningSnackPref(); },
+        "Nie wiem": () => { currentStep = 'morning_unknown'; askMorningWarmCold(); }
+      });
+    } else if (period === 'midday') {
+      showQuestion("Co zjadłbyś w południe?", {
+        "Pizza": () => { currentStep = 'midday_pizza'; showFinalPizza(); },
+        "Burger": () => { currentStep = 'midday_burger'; showFinalBurger(); },
+        "Kawa i lekka przekąska": () => { currentStep = 'midday_snack'; askMiddaySnackPref(); },
+        "Nie wiem": () => { currentStep = 'midday_unknown'; askMiddayLightHeavy(); }
+      });
+    } else if (period === 'evening') {
+      showQuestion("Co wolisz wieczorem?", {
+        "Drink": () => { currentStep = 'evening_drink'; askAlcoholPref(); },
+        "Kolacja": () => { currentStep = 'evening_dinner'; askDinnerPref(); },
+        "Nie wiem": () => { currentStep = 'evening_unknown'; askEveningDrinkFood(); }
+      });
     }
+  }
 
-    backBtn.onclick = () => {
-      if (history.length > 0) {
-        currentIndex = history.pop();
-        renderQuestion();
+  function askMorningSweetPref() {
+    showQuestion("Wolisz coś owocowego czy czekoladowego na słodkie śniadanie?", {
+      "Owocowe": () => showFinalMorningSweetFruit(),
+      "Czekoladowe": () => showFinalMorningSweetChoco()
+    });
+  }
+  function askMorningSavoryPref() {
+    showQuestion("Co preferujesz rano na słono?", {
+      "Jajka": () => showFinalMorningEggs(),
+      "Ser": () => showFinalMorningCheese(),
+      "Mięso": () => showFinalMorningMeat()
+    });
+  }
+  function askMorningSnackPref() {
+    showQuestion("Przekąska do kawy na słodko czy wytrawnie?", {
+      "Słodka": () => showFinalMorningSweetSnack(),
+      "Wytrawna": () => showFinalMorningSavorySnack()
+    });
+  }
+  function askMorningWarmCold() {
+    showQuestion("Wolisz coś ciepłego czy zimnego z rana?", {
+      "Ciepłe": () => showFinalMorningWarm(),
+      "Zimne": () => showFinalMorningCold()
+    });
+  }
+  function askMiddaySnackPref() {
+    showQuestion("Przekąska do kawy – na słodko czy słono?", {
+      "Na słodko": () => showFinalMiddaySweetSnack(),
+      "Na słono": () => showFinalMiddaySavorySnack()
+    });
+  }
+
+  function askMiddayLightHeavy() {
+    showQuestion("Obiad ma być lekki czy sycący?", {
+      "Lekki": () => showFinalMiddayLight(),
+      "Sycący": () => showFinalMiddayHeavy()
+    });
+  }
+
+  function askAlcoholPref() {
+    showQuestion("Drink alkoholowy czy bezalkoholowy?", {
+      "Alkoholowy": () => showFinalAlcoholicDrink(),
+      "Bezalkoholowy": () => showFinalNonAlcoholicDrink()
+    });
+  }
+
+  function askDinnerPref() {
+    showQuestion("Wolisz danie mięsne czy bezmięsne na kolację?", {
+      "Mięsne": () => showFinalDinnerMeat(),
+      "Bezmięsne": () => showFinalDinnerVeg()
+    });
+  }
+
+  function askEveningDrinkFood() {
+    showQuestion("Nie możesz się zdecydować – bardziej drink czy jedzenie?", {
+      "Coś do picia": () => {
+        currentStep = 'evening_drink';
+        askAlcoholPref();
+      },
+      "Coś do zjedzenia": () => {
+        currentStep = 'evening_dinner';
+        askDinnerPref();
       }
-    };
+    });
+  }
+  function displayFinal(dishName, imageUrl, menuUrl, restaurantName, restaurantLink) {
+    quizContent.innerHTML = `
+      <div class="final-screen">
+        <h3>${dishName}</h3>
+        <div class="final-images">
+          <img src="${imageUrl}" alt="Danie">
+          <img src="${menuUrl}" alt="Menu restauracji">
+        </div>
+        <p>Odwiedź: <a href="${restaurantLink}" target="_blank">${restaurantName}</a></p>
+      </div>
+    `;
+    backBtn.disabled = true;
+  }
 
-    renderQuestion();
-  </script>
-</body>
-</html>
+  function showFinalMorningSweetFruit() {
+    displayFinal(
+      "Tapioka z masłem orzechowym i bananem",
+      "https://afavela.pl/wp-content/uploads/2021/09/tapioka1.jpg",
+      "https://afavela.pl/wp-content/uploads/2021/09/menu-afavela.jpg",
+      "A'Favela – Brazylijska restauracja bezglutenowa",
+      "https://afavela.pl/"
+    );
+  }
+
+  function showFinalMorningSweetChoco() {
+    displayFinal(
+      "Tapioka z nutellą i bananem",
+      "https://afavela.pl/wp-content/uploads/2021/09/tapioka2.jpg",
+      "https://afavela.pl/wp-content/uploads/2021/09/menu-afavela.jpg",
+      "A'Favela – Brazylijska restauracja bezglutenowa",
+      "https://afavela.pl/"
+    );
+  }
+
+  function showFinalMorningEggs() {
+    displayFinal(
+      "Jajka z dodatkami (bez glutenu)",
+      "https://afavela.pl/wp-content/uploads/2021/09/omlet.jpg",
+      "https://afavela.pl/wp-content/uploads/2021/09/menu-afavela.jpg",
+      "A'Favela – Brazylijska restauracja bezglutenowa",
+      "https://afavela.pl/"
+    );
+  }
+
+  function showFinalMorningCheese() {
+    displayFinal(
+      "Crepioca z serem i oregano",
+      "https://afavela.pl/wp-content/uploads/2021/09/crepioca.jpg",
+      "https://afavela.pl/wp-content/uploads/2021/09/menu-afavela.jpg",
+      "A'Favela – Brazylijska restauracja bezglutenowa",
+      "https://afavela.pl/"
+    );
+  }
+
+  function showFinalMorningMeat() {
+    displayFinal(
+      "Tapioka z boczkiem i jajkiem",
+      "https://afavela.pl/wp-content/uploads/2021/09/tapioka3.jpg",
+      "https://afavela.pl/wp-content/uploads/2021/09/menu-afavela.jpg",
+      "A'Favela – Brazylijska restauracja bezglutenowa",
+      "https://afavela.pl/"
+    );
+  }
+
+  function showFinalMorningSweetSnack() {
+    displayFinal(
+      "Czekoladowe ciastko bez glutenu",
+      "https://fitcake.pl/wp-content/uploads/2021/09/brownie.jpg",
+      "https://fitcake.pl/wp-content/uploads/2021/09/menu-fitcake.jpg",
+      "Fit Cake – Poznań",
+      "https://www.facebook.com/fitcakepoznan/"
+    );
+  }
+
+  function showFinalMorningSavorySnack() {
+    displayFinal(
+      "Tost bezglutenowy z pastą warzywną",
+      "https://jaglana.pl/wp-content/uploads/2021/09/tost.jpg",
+      "https://jaglana.pl/wp-content/uploads/2021/09/menu-jaglana.jpg",
+      "Jaglana – Bezglutenowe śniadania",
+      "https://www.facebook.com/jaglanapoznan/"
+    );
+  }
+
+  function showFinalMorningWarm() {
+    displayFinal(
+      "Ciepła owsianka bezglutenowa z owocami",
+      "https://bezglutenowamama.pl/wp-content/uploads/2022/04/owsianka.jpg",
+      "https://bezglutenowamama.pl/menu.jpg",
+      "Bezglutenowa Mama – przepis",
+      "https://bezglutenowamama.pl/"
+    );
+  }
+
+  function showFinalMorningCold() {
+    displayFinal(
+      "Jogurt naturalny z owocami",
+      "https://bezglutenowamama.pl/wp-content/uploads/2022/04/jogurt.jpg",
+      "https://bezglutenowamama.pl/menu.jpg",
+      "Bezglutenowa Mama – przepis",
+      "https://bezglutenowamama.pl/"
+    );
+  }
+
+  function showFinalPizza() {
+    displayFinal(
+      "Pizza bezglutenowa Parma (z rukolą)",
+      "https://afavela.pl/wp-content/uploads/2021/09/pizza.jpg",
+      "https://afavela.pl/wp-content/uploads/2021/09/menu-afavela.jpg",
+      "A'Favela – Pizza bezglutenowa",
+      "https://afavela.pl/"
+    );
+  }
+
+  function showFinalBurger() {
+    displayFinal(
+      "Bezglutenowy burger z frytkami",
+      "https://glutenfreepoznan.pl/wp-content/uploads/2022/04/burger.jpg",
+      "https://glutenfreepoznan.pl/menu.jpg",
+      "Gluten Free – Poznań",
+      "https://glutenfreepoznan.pl/"
+    );
+  }
+
+  function showFinalMiddaySweetSnack() {
+    displayFinal(
+      "Brownie z kawą",
+      "https://sorrir.pl/images/brownie.jpg",
+      "https://sorrir.pl/menu.jpg",
+      "Sorrir – Kawiarnia bez glutenu",
+      "https://www.facebook.com/sorrir.poznan/"
+    );
+  }
+
+  function showFinalMiddaySavorySnack() {
+    displayFinal(
+      "Mini quiche warzywne",
+      "https://zdolni.pl/images/quiche.jpg",
+      "https://zdolni.pl/menu.jpg",
+      "Zdolni – Bezglutenowy lunch",
+      "https://www.facebook.com/ZdolniFood/"
+    );
+  }
+
+  function showFinalMiddayLight() {
+    displayFinal(
+      "Sałatka z kurczakiem i komosą ryżową",
+      "https://glutenfreepoznan.pl/images/salatka.jpg",
+      "https://glutenfreepoznan.pl/menu.jpg",
+      "Gluten Free – Poznań",
+      "https://glutenfreepoznan.pl/"
+    );
+  }
+
+  function showFinalMiddayHeavy() {
+    displayFinal(
+      "Pad Thai z kurczakiem – bezglutenowy",
+      "https://glutenfreepoznan.pl/images/padthai.jpg",
+      "https://glutenfreepoznan.pl/menu.jpg",
+      "Gluten Free – Poznań",
+      "https://glutenfreepoznan.pl/"
+    );
+  }
+
+  function showFinalAlcoholicDrink() {
+    displayFinal(
+      "Mojito bez glutenu",
+      "https://dram.bar/images/mojito.jpg",
+      "https://dram.bar/menu.jpg",
+      "Dram Bar – Poznań",
+      "https://dram.bar/"
+    );
+  }
+
+  function showFinalNonAlcoholicDrink() {
+    displayFinal(
+      "Owocowy mocktail",
+      "https://justfriends-restauracja-poznan.pl/images/mocktail.jpg",
+      "https://justfriends-restauracja-poznan.pl/menu.jpg",
+      "Just Friends – Poznań",
+      "https://justfriends-restauracja-poznan.pl/"
+    );
+  }
+
+  function showFinalDinnerMeat() {
+    displayFinal(
+      "Stek wołowy z warzywami (bezglutenowo)",
+      "https://podbaranem.com/images/stek.jpg",
+      "https://podbaranem.com/menu.jpg",
+      "Restauracja Pod Baranem",
+      "https://podbaranem.com/"
+    );
+  }
+
+  function showFinalDinnerVeg() {
+    displayFinal(
+      "Makaron ryżowy z warzywami",
+      "https://maitri-restauracja.pl/images/vege.jpg",
+      "https://maitri-restauracja.pl/menu.jpg",
+      "Maitri – Poznań",
+      "http://maitri-restauracja.pl/"
+    );
+  }
+
+  // start quiz on page load
+  startQuiz();
+</script>
