@@ -56,11 +56,11 @@
         getOptions: (answers) => {
           switch (answers.poradnia) {
             case 'Rano':
-              return ['Coś słodkiego', 'Coś delikatnego i ciepłego', 'Kawa i lekka przekąska'];
+              return ['Coś słodkiego', 'Coś na słono', 'Kawa i lekka przekąska', 'Nie wiem'];
             case 'Południe':
-              return ['Coś konkretnego', 'Coś lekkiego i świeżego', 'Kawa i coś słonego'];
+              return ['Pizza', 'Burger', 'Sałatka', 'Kawa i lekka przekąska'];
             case 'Wieczorem':
-              return ['Coś na ciepło i sycącego', 'Coś romantycznego i lekkiego', 'Kolacja + kawa/herbata'];
+              return ['Romantyczna kolacja', 'Coś na ciepło i sycącego', 'Coś do podziału (np. tapas)', 'Drin i coś lekkiego'];
           }
         },
         text: 'Na co masz dziś ochotę?'
@@ -80,10 +80,10 @@
     const restauracje = {
       'Rano-Coś słodkiego-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Jaglana – gofry gryczane z owocami 🍓',
       'Rano-Kawa i lekka przekąska-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Sorrir – smoothie bowl i kawa ☕',
-      'Południe-Coś konkretnego-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Pizza Naturalna – Margherita na bezglutenowym cieście 🍕',
-      'Południe-Coś lekkiego i świeżego-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Bezzbożny – sałatka z komosą ryżową 🥗',
-      'Wieczorem-Coś romantycznego i lekkiego-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Też Można – wegański burger na bezglutenowej bułce 🍔',
-      'Wieczorem-Kolacja + kawa/herbata-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Kafej – ciasto czekoladowe i kawa ☕'
+      'Południe-Pizza-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Pizza Naturalna – Margherita na bezglutenowym cieście 🍕',
+      'Południe-Sałatka-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Bezzbożny – sałatka z komosą ryżową 🥗',
+      'Wieczorem-Romantyczna kolacja-Ciepłego-Chcę się przytulić do czegoś pysznego 🍲': 'Też Można – wegański burger na bezglutenowej bułce 🍔',
+      'Wieczorem-Drin i coś lekkiego-Zimnego i orzeźwiającego-Mam ochotę na coś radosnego i kolorowego 🧁': 'Kafej – ciasto czekoladowe i kawa ☕'
     };
 
     let currentIndex = 0;
